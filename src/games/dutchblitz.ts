@@ -50,6 +50,10 @@ class DutchBlitz implements Game {
 		return winner;
 	}
 
+	/**
+	 * Calculates the standard deviation from average score, and updates player deck size
+	 * @private
+	 */
 	private updateDeckSizes(): void {
 		const scores = this.getPlayers().map(player => player.score);
 		const avg = average(scores);
