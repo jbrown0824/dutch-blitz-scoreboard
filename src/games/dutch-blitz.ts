@@ -5,12 +5,26 @@ import standardDeviation from '../utils/standard-deviation';
 
 const DEFAULT_DECK_SIZE = 10;
 
+interface GameOptions {
+	pointsNeededToWin: number;
+	weight: number;
+	min: number;
+	max: number;
+}
+
 class DutchBlitz implements Game {
 	players: Player[] = [];
 	pointsNeededToWin: number;
+	roundNumber: number = 0;
+	weight: number = 1;
+	min: number = 5;
+	max: number = 15;
 
-	constructor(pointsNeededToWin: number = 75) {
-		this.pointsNeededToWin = pointsNeededToWin;
+	constructor(options: GameOptions) {
+		this.pointsNeededToWin = options.pointsNeededToWin;
+		this.weight = options.weight;
+		this.min = options.min;
+		this.max = options.max;
 	}
 
 	addPlayer(name: string): void {
@@ -22,14 +36,11 @@ class DutchBlitz implements Game {
 	}
 
 	startRound(): Player[] {
+		console.log('starting round');
 		this.updateDeckSizes();
-		const players = this.getPlayers();
+		this.roundNumber++;
 
-		players.forEach(player => {
-			console.log(player.name, ' needs a deck size of ', player.deckSize);
-		});
-
-		return players;
+		return this.getPlayers();
 	}
 
 	addScore(player: Player, roundScore: number): void {
@@ -64,7 +75,8 @@ class DutchBlitz implements Game {
 				player.deckSize = DEFAULT_DECK_SIZE;
 			} else {
 				const playerDeviationFromAverage = (player.score - avg) / stdDev;
-				player.deckSize = DEFAULT_DECK_SIZE + Math.round(playerDeviationFromAverage);
+				const adjustment = (stdDev * playerDeviationFromAverage) / DEFAULT_DECK_SIZE
+				player.deckSize = DEFAULT_DECK_SIZE + Math.round(adjustment);
 			}
 		});
 	}

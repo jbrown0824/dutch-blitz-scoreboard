@@ -1,49 +1,62 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useEffect, useState } from 'react';
 import './App.css';
-import DutchBlitz from './games/dutchblitz';
+import DutchBlitz from './games/dutch-blitz';
+import PlayerScores from './components/PlayerScores';
+import RecordScores from './components/RecordScores';
+import NewGame from './components/NewGame';
 
 function App() {
 
-  const ourGame = new DutchBlitz();
+	const [gameName, setGameName] = useState<string>('a');
+	const [onNewGame, setOnNewGame] = useState<boolean>(true);
+	const [roundNumber, setRoundNumber] = useState<number>(0);
 
-  ourGame.addPlayer('Noah');
-  ourGame.addPlayer('Q');
-  ourGame.addPlayer('Jeff');
-  ourGame.addPlayer('Micah');
+	const [game, setGame] = useState<DutchBlitz | undefined>();
 
-  console.log('---------- Game Start');
+	useEffect(() => {
+		setRoundNumber(game?.roundNumber ?? 0);
+	}, [gameName]);
 
-  const players = ourGame.startRound();
+	const onNewRound = () => {
+		setRoundNumber(game?.roundNumber ?? 0);
+		console.log('round changing');
+	};
 
+	const startNewGame = () => {
+		setOnNewGame(true);
+	};
 
-  ourGame.addScore(players[0], 17);
-  ourGame.addScore(players[1], 27);
-  ourGame.addScore(players[2], 3);
-  ourGame.addScore(players[3], 40);
+	const onCreateNewGame = (newGame: DutchBlitz) => {
+		setGame(newGame);
+		setGameName(newGame.getPlayers().map(p => p.name).join() + newGame.roundNumber);
+		setOnNewGame(false);
+	}
 
-  console.log('---------- Next Round');
+	const onCancelNewGame = () => setOnNewGame(false);
 
-  ourGame.startRound();
+	if (onNewGame) {
+		return (
+			<div className="App">
+				<NewGame onCreate={onCreateNewGame} onCancel={onCancelNewGame}/>
+			</div>
+		)
+	}
 
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Hello World!
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	return (
+		<div className="App">
+			<input type='hidden' value={gameName} />
+			<h1>Dutch Blitz Scoreboard</h1>
+			<button onClick={startNewGame}>New Game</button>
+
+			<br /><br />
+			Round: {roundNumber}<br />
+
+			<div className="game-wrapper">
+				<PlayerScores game={game} round={roundNumber}/>
+				<RecordScores game={game} round={roundNumber} onNewRound={onNewRound}/>
+			</div>
+		</div>
+	);
 }
 
 export default App;
