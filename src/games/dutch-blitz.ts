@@ -36,7 +36,6 @@ class DutchBlitz implements Game {
 	}
 
 	startRound(): Player[] {
-		console.log('starting round');
 		this.updateDeckSizes();
 		this.roundNumber++;
 
@@ -69,14 +68,16 @@ class DutchBlitz implements Game {
 		const scores = this.getPlayers().map(player => player.score);
 		const avg = average(scores);
 		const stdDev = standardDeviation(scores);
-
 		this.getPlayers().forEach(player => {
 			if (stdDev === 0) {
 				player.deckSize = DEFAULT_DECK_SIZE;
 			} else {
 				const playerDeviationFromAverage = (player.score - avg) / stdDev;
-				const adjustment = (stdDev * playerDeviationFromAverage) / DEFAULT_DECK_SIZE
-				player.deckSize = DEFAULT_DECK_SIZE + Math.round(adjustment);
+
+				const adjustment = (stdDev * playerDeviationFromAverage) / DEFAULT_DECK_SIZE;
+
+				let newDeckSize = Math.max(this.min, DEFAULT_DECK_SIZE + Math.round(adjustment));
+				player.deckSize = Math.min(this.max, newDeckSize);
 			}
 		});
 	}

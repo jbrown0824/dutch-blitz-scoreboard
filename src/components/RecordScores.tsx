@@ -17,9 +17,11 @@ export default function RecordScores({ game, round, onNewRound }: RecordScoresPr
 
 	const setScore = (value: string, i: number) => {
 		const score: number = parseInt(value) as number;
-		let updatedScores = [...scores];
-		updatedScores[i] = score;
-		setScores(updatedScores);
+		if (!isNaN(score)) {
+			let updatedScores = [...scores];
+			updatedScores[i] = score;
+			setScores(updatedScores);
+		}
 	}
 
 	const saveScores = () => {
